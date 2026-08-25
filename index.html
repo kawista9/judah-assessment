@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 24px;
+    background: #f7f2e7;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #21142f;
+  }
+
+  .assessment {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #fffdf7;
+    border: 2px solid #c99b2e;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(50, 24, 77, 0.12);
+  }
+
+  .header {
+    text-align: center;
+    padding: 34px 24px 25px;
+    border-bottom: 3px solid #c99b2e;
+    background: linear-gradient(to bottom, #fffdf7, #fbf5e7);
+  }
+
+  .header h1 {
+    margin: 0;
+    font-size: clamp(30px, 5vw, 54px);
+    color: #35105e;
+    letter-spacing: 1px;
+  }
+
+  .header .subtitle {
+    margin-top: 5px;
+    font-size: clamp(24px, 4vw, 40px);
+    color: #b47d0c;
+    font-style: italic;
+  }
+
+  .header p {
+    max-width: 760px;
+    margin: 16px auto 0;
+    line-height: 1.55;
+    font-size: 16px;
+    color: #3d3543;
+  }
+
+  .scale-box {
+    margin: 25px;
+    border: 2px solid #c99b2e;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .scale-title {
+    background: #35105e;
+    color: white;
+    text-align: center;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .scale {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .scale-item {
+    padding: 15px 8px;
+    text-align: center;
+    border-right: 1px solid #d8b55c;
+    background: #fffaf0;
+  }
+
+  .scale-item:last-child {
+    border-right: 0;
+  }
+
+  .scale-number {
+    display: block;
+    color: #35105e;
+    font-size: 27px;
+    font-weight: bold;
+  }
+
+  .scale-meaning {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  .questions {
+    padding: 0 25px 25px;
+  }
+
+  .question-card {
+    border: 1px solid #e0c67b;
+    border-left: 6px solid #35105e;
+    border-radius: 10px;
+    margin: 15px 0;
+    background: white;
+    padding: 20px;
+    transition: 0.2s ease;
+  }
+
+  .question-card:hover {
+    box-shadow: 0 4px 14px rgba(53,16,94,.08);
+  }
+
+  .question-number {
+    color: #35105e;
+    font-weight: bold;
+    font-size: 20px;
+  }
+
+  .question-text {
+    font-size: 17px;
+    line-height: 1.5;
+    margin: 6px 0 17px;
+  }
+
+  .answers {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+
+  .answer-option {
+    position: relative;
+  }
+
+  .answer-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .answer-option label {
+    display: block;
+    cursor: pointer;
+    text-align: center;
+    padding: 12px 5px;
+    border: 2px solid #dbc995;
+    border-radius: 9px;
+    background: #fffdf8;
+    font-size: 15px;
+    transition: all .15s ease;
+  }
+
+  .answer-option label strong {
+    display: block;
+    color: #35105e;
+    font-size: 20px;
+    margin-bottom: 2px;
+  }
+
+  .answer-option input:checked + label {
+    color: white;
+    background: #35105e;
+    border-color: #c99b2e;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(53,16,94,.2);
+  }
+
+  .answer-option input:checked + label strong {
+    color: #f2d77e;
+  }
+
+  .submit-area {
+    text-align: center;
+    padding: 10px 25px 35px;
+  }
+
+  button {
+    border: none;
+    border-radius: 999px;
+    padding: 15px 40px;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  #submitBtn {
+    background: #35105e;
+    color: white;
+    border: 2px solid #c99b2e;
+  }
+
+  #submitBtn:hover {
+    transform: translateY(-2px);
+    background: #461276;
+  }
+
+  #resetBtn {
+    margin-left: 10px;
+    background: transparent;
+    color: #35105e;
+    border: 2px solid #35105e;
+  }
+
+  .error {
+    display: none;
+    max-width: 700px;
+    margin: 18px auto 0;
+    color: #9a1c1c;
+    background: #fff0f0;
+    border: 1px solid #d99b9b;
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  #results {
+    display: none;
+    margin: 0 25px 35px;
+    border: 3px solid #c99b2e;
+    border-radius: 16px;
+    overflow: hidden;
+    scroll-margin-top: 20px;
+  }
+
+  .result-header {
+    background: #35105e;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .result-header h2 {
+    margin: 0;
+    font-size: 30px;
+  }
+
+  .score-display {
+    font-size: 48px;
+    color: #f1d370;
+    font-weight: bold;
+    margin-top: 8px;
+  }
+
+  .result-body {
+    padding: 28px;
+    text-align: center;
+    background: #fffdf7;
+  }
+
+  .result-category {
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .result-description {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 17px;
+    line-height: 1.65;
+  }
+
+  .prayer-box {
+    max-width: 750px;
+    margin: 25px auto 5px;
+    padding: 22px;
+    border-radius: 12px;
+    background: #f6eed8;
+    border: 2px solid #c99b2e;
+  }
+
+  .prayer-label {
+    color: #8e6407;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .prayer-stage {
+    color: #35105e;
+    font-size: 30px;
+    font-weight: bold;
+    margin: 5px 0;
+  }
+
+  .prayer-guidance {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .closing {
+    text-align: center;
+    color: #35105e;
+    padding: 0 25px 35px;
+    font-size: 17px;
+    font-style: italic;
+  }
+
+  @media (max-width: 700px) {
+    body {
+      padding: 8px;
+    }
+
+    .scale-box {
+      margin: 15px;
+    }
+
+    .scale {
+      grid-template-columns: 1fr;
+    }
+
+    .scale-item {
+      border-right: 0;
+      border-bottom: 1px solid #d8b55c;
+    }
+
+    .scale-item:last-child {
+      border-bottom: 0;
+    }
+
+    .questions {
+      padding: 0 14px 18px;
+    }
+
+    .question-card {
+      padding: 16px 12px;
+    }
+
+    .answers {
+      gap: 5px;
+    }
+
+    .answer-option label {
+      padding: 10px 2px;
+      font-size: 11px;
+    }
+
+    .answer-option label strong {
+      font-size: 18px;
+    }
+
+    #resetBtn {
+      display: block;
+      margin: 10px auto 0;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="assessment">
+
+  <section class="header">
+    <h1>GATE OF JUDAH ASSESSMENT</h1>
+    <div class="subtitle">The Gate of Praise</div>
+
+    <p>
+      Use the scale below to answer each question honestly based on your normal
+      patterns, especially during stress, conflict, disappointment, fear, or
+      emotional pressure.
+    </p>
+  </section>
+
+
+  <div class="scale-box">
+    <div class="scale-title">ANSWER SCALE</div>
+
+    <div class="scale">
+      <div class="scale-item">
+        <span class="scale-number">1</span>
+        <span class="scale-meaning">Not Like Me<br>At All</span>
+      </div>
+
+      <div class="scale-item">
+        <span class="scale-number">2</span>
+        <span class="scale-meaning">Rarely<br>Like Me</span>
+      </div>
+
+      <div class="scale-item">
+        <span class="scale-number">3</span>
+        <span class="scale-meaning">Sometimes<br>Like Me</span>
+      </div>
+
+      <div class="scale-item">
+        <span class="scale-number">4</span>
+        <span class="scale-meaning">Often<br>Like Me</span>
+      </div>
+
+      <div class="scale-item">
+        <span class="scale-number">5</span>
+        <span class="scale-meaning">Very Much<br>Like Me</span>
+      </div>
+    </div>
+  </div>
+
+
+  <form id="judahForm">
+
+    <div class="questions" id="questionContainer"></div>
+
+    <div class="submit-area">
+      <button type="submit" id="submitBtn">
+        See My Judah Assessment
+      </button>
+
+      <button type="button" id="resetBtn">
+        Reset
+      </button>
+
+      <div class="error" id="errorMessage">
+        Please answer all 10 questions before submitting your assessment.
+      </div>
+    </div>
+
+  </form>
+
+
+  <section id="results">
+
+    <div class="result-header">
+      <h2>Your Judah Assessment</h2>
+      <div class="score-display">
+        <span id="score"></span>/50
+      </div>
+    </div>
+
+    <div class="result-body">
+
+      <div class="result-category" id="category"></div>
+
+      <div class="result-description" id="description"></div>
+
+      <div class="prayer-box">
+        <div class="prayer-label">
+          Your Recommended Starting Prayer
+        </div>
+
+        <div class="prayer-stage" id="prayerStage"></div>
+
+        <div class="prayer-guidance" id="prayerGuidance"></div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <div class="closing">
+    Your voice matters. Your words carry power.<br>
+    Let the Gate of Praise be aligned with truth, freedom, and life.
+  </div>
+
+</div>
+
+
+<script>
+
+const questions = [
+
+  "When I need to express how I truly feel, I often rehearse conversations in my head but struggle to actually say the words aloud.",
+
+  "I frequently silence myself to avoid conflict, rejection, embarrassment, or being misunderstood.",
+
+  "My internal dialogue is often harsher than the way I speak to other people.",
+
+  "When I feel emotionally overwhelmed, I tend to shut down, withdraw, or stop communicating instead of processing things openly.",
+
+  "I find it difficult to pray aloud, speak boldly, sing freely, or verbally express gratitude without feeling self-conscious or restrained.",
+
+  "I often feel tension in my jaw, throat, chest, mouth, or voice during stressful conversations or emotional situations.",
+
+  "When I am hurt, frustrated, or disappointed, I tend to replay situations repeatedly in my mind instead of releasing them through healthy expression, prayer, or conversation.",
+
+  "I sometimes feel like my voice does not matter, will not change anything, or creates problems when I use it honestly.",
+
+  "I notice that fear, anxiety, shame, or emotional pressure can quickly change the way I speak, causing me to become silent, reactive, defensive, overly harsh, or emotionally impulsive.",
+
+  "I struggle to consistently use my words to build, encourage, praise, petition, and bring life when I am under emotional pressure."
+
+];
+
+
+const container = document.getElementById("questionContainer");
+
+
+questions.forEach((question, index) => {
+
+  const questionNumber = index + 1;
+
+  const card = document.createElement("div");
+  card.className = "question-card";
+
+  let choices = "";
+
+  for (let value = 1; value <= 5; value++) {
+
+    const meanings = {
+      1: "Not At All",
+      2: "Rarely",
+      3: "Sometimes",
+      4: "Often",
+      5: "Very Much"
+    };
+
+    choices += `
+      <div class="answer-option">
+        <input
+          type="radio"
+          id="q${questionNumber}_${value}"
+          name="q${questionNumber}"
+          value="${value}"
+        >
+
+        <label for="q${questionNumber}_${value}">
+          <strong>${value}</strong>
+          ${meanings[value]}
+        </label>
+      </div>
+    `;
+  }
+
+
+  card.innerHTML = `
+    <div class="question-number">
+      Question ${questionNumber}
+    </div>
+
+    <div class="question-text">
+      ${question}
+    </div>
+
+    <div class="answers">
+      ${choices}
+    </div>
+  `;
+
+  container.appendChild(card);
+
+});
+
+
+document.getElementById("judahForm").addEventListener("submit", function(event) {
+
+  event.preventDefault();
+
+  let total = 0;
+  let allAnswered = true;
+
+
+  for (let i = 1; i <= questions.length; i++) {
+
+    const selected =
+      document.querySelector('input[name="q' + i + '"]:checked');
+
+    if (!selected) {
+      allAnswered = false;
+      break;
+    }
+
+    total += Number(selected.value);
+  }
+
+
+  const error = document.getElementById("errorMessage");
+
+
+  if (!allAnswered) {
+
+    error.style.display = "block";
+
+    const firstUnanswered =
+      [...document.querySelectorAll(".question-card")]
+      .find((card, index) => {
+        return !document.querySelector(
+          'input[name="q' + (index + 1) + '"]:checked'
+        );
+      });
+
+    if (firstUnanswered) {
+      firstUnanswered.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+
+    return;
+  }
+
+
+  error.style.display = "none";
+
+
+  let category = "";
+  let description = "";
+  let prayerStage = "";
+  let prayerGuidance = "";
+  let resultColor = "";
+
+
+  /*
+    SCORING:
+
+    10–20 = Judah Functioning Strongly
+    21–35 = Judah Under Strain
+    36–50 = Judah Offline
+
+    Prayer stages are intentionally reversed relative
+    to the numerical score because Stage 1 represents
+    the foundational/restorative starting prayer.
+  */
+
+
+  if (total <= 20) {
+
+    category = "JUDAH FUNCTIONING STRONGLY";
+
+    description =
+      "The Gate of Praise appears relatively healthy and aligned. " +
+      "Your mouth generally functions as a place of truthful expression, " +
+      "praise, emotional release, and life-giving communication. While " +
+      "growth is always possible, fear and emotional pressure do not " +
+      "consistently control your voice.";
+
+    prayerStage = "STAGE 3 PRAYER";
+
+    prayerGuidance =
+      "Begin the week praying from a posture of maintenance, maturity, " +
+      "and continued alignment. Your focus is not rebuilding the gate " +
+      "from the ground up, but strengthening what God has already " +
+      "established and intentionally using your voice for praise, truth, " +
+      "petition, encouragement, and life.";
+
+    resultColor = "#2f7d32";
+
+  }
+
+
+  else if (total <= 35) {
+
+    category = "JUDAH UNDER STRAIN";
+
+    description =
+      "Your Gate of Praise shows signs of inconsistency and internal conflict. " +
+      "Certain wounds, fears, or emotional habits may be affecting your " +
+      "ability to communicate, pray, release emotions, or speak with " +
+      "clarity and confidence. At times your mouth may function from " +
+      "anxiety, suppression, overthinking, or emotional reaction rather " +
+      "than alignment.";
+
+    prayerStage = "STAGE 2 PRAYER";
+
+    prayerGuidance =
+      "Begin the week with the Stage 2 prayer. Focus on strengthening, " +
+      "renewing, and retraining the gate. Pay attention to the moments " +
+      "when pressure changes your voice, and invite God into the patterns " +
+      "that cause you to withdraw, overthink, react, or silence yourself.";
+
+    resultColor = "#2458a6";
+
+  }
+
+
+  else {
+
+    category = "JUDAH OFFLINE";
+
+    description =
+      "Your Gate of Praise may be functioning from survival patterns rather " +
+      "than healthy alignment. Suppressed emotions, fear of expression, " +
+      "harsh self-talk, shutdown, reactive speech, anxiety, shame, or " +
+      "spiritual muting may be significantly affecting the way you use " +
+      "your voice. This does not mean you are broken; it identifies an " +
+      "area of the gate that needs focused healing, retraining, mercy, " +
+      "and restoration.";
+
+    prayerStage = "STAGE 1 PRAYER";
+
+    prayerGuidance =
+      "Begin the week with the foundational Stage 1 prayer. Give your " +
+      "attention to healing and restoration before trying to force " +
+      "performance. Allow God to uncover the places where your voice " +
+      "learned to hide, defend itself, become harsh, or remain silent, " +
+      "and begin restoring truthful and safe expression.";
+
+    resultColor = "#b47d0c";
+
+  }
+
+
+  document.getElementById("score").textContent = total;
+
+  const categoryElement = document.getElementById("category");
+
+  categoryElement.textContent = category;
+  categoryElement.style.color = resultColor;
+
+  document.getElementById("description").textContent = description;
+
+  document.getElementById("prayerStage").textContent = prayerStage;
+
+  document.getElementById("prayerGuidance").textContent = prayerGuidance;
+
+
+  const results = document.getElementById("results");
+
+  results.style.display = "block";
+
+  results.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+});
+
+
+document.getElementById("resetBtn").addEventListener("click", function() {
+
+  document.getElementById("judahForm").reset();
+
+  document.getElementById("results").style.display = "none";
+
+  document.getElementById("errorMessage").style.display = "none";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+});
+
+</script>
+
+</body>
+</html>
